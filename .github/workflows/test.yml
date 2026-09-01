@@ -1,0 +1,44 @@
+name: Test Hadith Image
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Generate Hadith HTML
+        run: python generate_html.py
+
+      - name: Create PNG image
+        run: node render.js
+
+      - name: Save generated image
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add hadith.png output.html latest.json state.json
+          git commit -m "Generate Hadith image" || echo "Nothing to commit"
+          git push
