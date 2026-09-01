@@ -1,114 +1,187 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
+
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <title>Hadith Poster</title>
 
   <style>
-    html, body {
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
       margin: 0;
       padding: 0;
       width: 1080px;
       height: 1920px;
       overflow: hidden;
-      background: #f5efe3;
-      font-family: "Noto Naskh Arabic", serif;
+      direction: rtl;
+      background: #f6efe3;
+      font-family:
+        "Noto Naskh Arabic",
+        "Noto Sans Arabic",
+        "Amiri",
+        Arial,
+        sans-serif;
     }
 
     .poster {
       position: relative;
       width: 1080px;
       height: 1920px;
+      overflow: hidden;
+
       background-image: url("assets/background.png");
-      background-size: cover;
+      background-size: 1080px 1920px;
+      background-repeat: no-repeat;
       background-position: center;
     }
 
-    .content {
+    /* عنوان الصورة */
+    .title {
       position: absolute;
-      top: 250px;
-      left: 130px;
-      right: 130px;
+      top: 240px;
+      left: 220px;
+      right: 220px;
+
       text-align: center;
+      color: #5a3417;
+      font-size: 68px;
+      font-weight: 700;
+      line-height: 1.2;
     }
 
-    .title {
-      font-size: 78px;
-      font-weight: 700;
-      color: #5b3519;
-      margin-bottom: 65px;
+    /* اسم القائل */
+    .sayer-box {
+      position: absolute;
+      top: 390px;
+      left: 140px;
+      right: 140px;
+      height: 100px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      overflow: hidden;
+      text-align: center;
     }
 
     .sayer {
-      font-size: 50px;
-      color: #13583c;
-      margin-bottom: 60px;
+      width: 100%;
+      color: #0f6949;
+      font-size: 42px;
+      font-weight: 600;
+      line-height: 1.45;
+
+      direction: rtl;
+      unicode-bidi: plaintext;
+      text-align: center;
+      white-space: normal;
+    }
+
+    /* صندوق الحديث */
+    .hadith-box {
+      position: absolute;
+      top: 545px;
+      left: 120px;
+      right: 120px;
+      height: 640px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      overflow: hidden;
+      text-align: center;
     }
 
     .hadith {
-      font-size: 58px;
-      line-height: 1.8;
-      color: #3c2819;
+      width: 100%;
+      color: #3d2818;
+      font-size: 56px;
       font-weight: 600;
+      line-height: 1.85;
+
+      direction: rtl;
+      unicode-bidi: plaintext;
+      text-align: center;
+
+      white-space: normal;
+      word-break: normal;
+      overflow-wrap: break-word;
+    }
+
+    /* المصدر */
+    .reference-box {
+      position: absolute;
+      top: 1460px;
+      left: 170px;
+      right: 170px;
+      height: 120px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      overflow: hidden;
+      text-align: center;
     }
 
     .reference {
-      position: absolute;
-      left: 150px;
-      right: 150px;
-      bottom: 290px;
-      text-align: center;
-      color: #13583c;
-      font-size: 42px;
-    }
-
-    .source-label {
-      color: #8b6427;
+      width: 100%;
+      color: #0f6949;
       font-size: 38px;
-      margin-bottom: 12px;
+      font-weight: 500;
+      line-height: 1.5;
+
+      direction: rtl;
+      unicode-bidi: plaintext;
+      text-align: center;
+      white-space: normal;
+      overflow-wrap: break-word;
     }
 
+    /* الفوتر */
     .footer {
       position: absolute;
-      bottom: 85px;
-      left: 0;
-      right: 0;
+      bottom: 74px;
+      left: 240px;
+      right: 240px;
+
       text-align: center;
-      color: #755633;
-      font-size: 30px;
+      color: #755535;
+      font-size: 28px;
+      line-height: 1.4;
     }
   </style>
 </head>
 
 <body>
-
   <div class="poster">
 
-    <div class="content">
-
-      <div class="title">
-        حديث اليوم
-      </div>
-
-      <div class="sayer">
-        {{SAYER}}
-      </div>
-
-      <div class="hadith">
-        {{HADITH}}
-      </div>
-
+    <div class="title">
+      حديث اليوم
     </div>
 
-    <div class="reference">
-
-      <div class="source-label">
-        المصدر
+    <div class="sayer-box">
+      <div class="sayer" id="sayer">
+        {{SAYER}}
       </div>
+    </div>
 
-      <div>
+    <div class="hadith-box" id="hadithBox">
+      <div class="hadith" id="hadith">
+        {{HADITH}}
+      </div>
+    </div>
+
+    <div class="reference-box" id="referenceBox">
+      <div class="reference" id="reference">
         {{REFERENCE}}
       </div>
-
     </div>
 
     <div class="footer">
@@ -117,5 +190,91 @@
 
   </div>
 
+  <script>
+    function fitElementByHeight(element, maxHeight, startSize, minSize, step, lineHeightRatio) {
+      let size = startSize;
+      element.style.fontSize = size + "px";
+      element.style.lineHeight = lineHeightRatio;
+
+      while (element.scrollHeight > maxHeight && size > minSize) {
+        size -= step;
+        element.style.fontSize = size + "px";
+      }
+    }
+
+    function fitSayer() {
+      const el = document.getElementById("sayer");
+      fitElementByHeight(el, 95, 42, 28, 2, 1.45);
+    }
+
+    function fitReference() {
+      const el = document.getElementById("reference");
+      fitElementByHeight(el, 110, 38, 26, 1, 1.45);
+    }
+
+    function fitHadith() {
+      const box = document.getElementById("hadithBox");
+      const el = document.getElementById("hadith");
+      const text = (el.innerText || "").trim();
+      const len = text.length;
+
+      let startSize = 56;
+      let minSize = 34;
+      let lineHeight = 1.85;
+
+      if (len > 260) {
+        startSize = 42;
+        lineHeight = 1.65;
+      } else if (len > 220) {
+        startSize = 46;
+        lineHeight = 1.70;
+      } else if (len > 180) {
+        startSize = 50;
+        lineHeight = 1.75;
+      } else if (len > 130) {
+        startSize = 54;
+        lineHeight = 1.80;
+      } else {
+        startSize = 56;
+        lineHeight = 1.85;
+      }
+
+      el.style.fontSize = startSize + "px";
+      el.style.lineHeight = lineHeight;
+
+      while (el.scrollHeight > box.clientHeight && startSize > minSize) {
+        startSize -= 2;
+        el.style.fontSize = startSize + "px";
+      }
+
+      while (el.scrollHeight > box.clientHeight && lineHeight > 1.45) {
+        lineHeight -= 0.05;
+        el.style.lineHeight = lineHeight.toFixed(2);
+      }
+    }
+
+    function centerHadithVertically() {
+      const box = document.getElementById("hadithBox");
+      const el = document.getElementById("hadith");
+
+      box.style.alignItems = "center";
+
+      if (el.scrollHeight > box.clientHeight * 0.82) {
+        box.style.alignItems = "flex-start";
+      }
+    }
+
+    function initLayout() {
+      fitSayer();
+      fitReference();
+      fitHadith();
+      centerHadithVertically();
+    }
+
+    window.addEventListener("load", () => {
+      setTimeout(initLayout, 150);
+    });
+  </script>
 </body>
+
 </html>
