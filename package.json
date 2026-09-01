@@ -1,0 +1,8 @@
+{
+  "name": "hadith-tiktok-bot",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}
