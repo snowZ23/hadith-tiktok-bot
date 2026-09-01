@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: #f5efe3;
+      font-family: "Noto Naskh Arabic", serif;
+    }
+
+    .poster {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      background-image: url("../assets/background.png");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .content {
+      position: absolute;
+      top: 250px;
+      left: 130px;
+      right: 130px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 78px;
+      font-weight: 700;
+      color: #5b3519;
+      margin-bottom: 65px;
+    }
+
+    .sayer {
+      font-size: 50px;
+      color: #13583c;
+      margin-bottom: 60px;
+    }
+
+    .hadith {
+      font-size: 58px;
+      line-height: 1.8;
+      color: #3c2819;
+      font-weight: 600;
+    }
+
+    .reference {
+      position: absolute;
+      left: 150px;
+      right: 150px;
+      bottom: 290px;
+      text-align: center;
+      color: #13583c;
+      font-size: 42px;
+    }
+
+    .source-label {
+      color: #8b6427;
+      font-size: 38px;
+      margin-bottom: 12px;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 85px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: #755633;
+      font-size: 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="poster">
+
+    <div class="content">
+
+      <div class="title">
+        حديث اليوم
+      </div>
+
+      <div class="sayer">
+        {{SAYER}}
+      </div>
+
+      <div class="hadith">
+        {{HADITH}}
+      </div>
+
+    </div>
+
+    <div class="reference">
+
+      <div class="source-label">
+        المصدر
+      </div>
+
+      <div>
+        {{REFERENCE}}
+      </div>
+
+    </div>
+
+    <div class="footer">
+      من تطبيق حديث اليوم
+    </div>
+
+  </div>
+
+</body>
+</html>
