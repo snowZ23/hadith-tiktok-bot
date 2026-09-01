@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>TikTok Authorization</title>
+</head>
+
+<body style="font-family:Arial;text-align:center;padding:50px">
+
+  <h2>تم الرجوع من TikTok</h2>
+
+  <p>Authorization Code:</p>
+
+  <textarea id="code"
+            style="width:90%;height:120px"></textarea>
+
+  <p id="status"></p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+
+    const code = params.get("code");
+    const error = params.get("error");
+    const errorDescription = params.get("error_description");
+
+    if (code) {
+      document.getElementById("code").value = code;
+      document.getElementById("status").innerText =
+        "تم الحصول على الكود بنجاح";
+    } else {
+      document.getElementById("status").innerText =
+        "خطأ: " + (errorDescription || error || "غير معروف");
+    }
+  </script>
+
+</body>
+</html>
