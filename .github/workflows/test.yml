@@ -1,7 +1,12 @@
-name: Test Hadith Image
+name: Daily Hadith Image
 
 on:
+  # يسمح لك بالتشغيل اليدوي وقتما تريد
   workflow_dispatch:
+
+  # تشغيل تلقائي يوميًا الساعة 10 مساءً بتوقيت العراق
+  schedule:
+    - cron: "0 19 * * *"
 
 permissions:
   contents: write
@@ -11,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Download project
         uses: actions/checkout@v4
 
@@ -40,5 +46,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add hadith.png output.html latest.json state.json
-          git commit -m "Generate Hadith image" || echo "Nothing to commit"
+          git commit -m "Generate daily Hadith image" || echo "Nothing to commit"
           git push
