@@ -2,8 +2,7 @@
 <html lang="ar" dir="rtl">
 
 <head>
-  <meta charset="utf-8" />
-  <title>Hadith Poster</title>
+  <meta charset="utf-8">
 
   <style>
     * {
@@ -13,16 +12,14 @@
     html,
     body {
       margin: 0;
-      padding: 0;
       width: 1080px;
       height: 1920px;
       overflow: hidden;
       direction: rtl;
-      background: #f6efe3;
+
       font-family:
         "Noto Naskh Arabic",
         "Noto Sans Arabic",
-        "Amiri",
         Arial,
         sans-serif;
     }
@@ -31,10 +28,357 @@
       position: relative;
       width: 1080px;
       height: 1920px;
-      overflow: hidden;
 
       background-image: url("assets/background.png");
       background-size: 1080px 1920px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* عنوان حديث اليوم */
+    .title {
+      position: absolute;
+
+      top: 315px;
+      left: 200px;
+      right: 200px;
+
+      text-align: center;
+
+      color: #573417;
+      font-size: 62px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    /* اسم القائل */
+    .sayer-box {
+      position: absolute;
+
+      top: 425px;
+      left: 155px;
+      right: 155px;
+
+      height: 105px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      overflow: hidden;
+    }
+
+    .sayer {
+      width: 100%;
+
+      text-align: center;
+      direction: rtl;
+
+      color: #0d6849;
+
+      font-size: 40px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    /* نص الحديث */
+    .hadith-box {
+      position: absolute;
+
+      top: 570px;
+      left: 135px;
+      right: 135px;
+
+      height: 560px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      overflow: hidden;
+    }
+
+    .hadith {
+      width: 100%;
+
+      text-align: center;
+      direction: rtl;
+
+      color: #3b281b;
+
+      font-size: 55px;
+      font-weight: 600;
+      line-height: 1.75;
+
+      white-space: normal;
+      word-break: normal;
+      overflow-wrap: normal;
+    }
+
+    /* المصدر */
+    .reference-box {
+      position: absolute;
+
+      top: 1450px;
+      left: 185px;
+      right: 185px;
+
+      height: 120px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      overflow: hidden;
+    }
+
+    .reference {
+      width: 100%;
+
+      text-align: center;
+      direction: rtl;
+      unicode-bidi: isolate;
+
+      color: #0d6849;
+
+      font-size: 37px;
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    /* الفوتر */
+    .footer {
+      position: absolute;
+
+      bottom: 28px;
+      left: 250px;
+      right: 250px;
+
+      text-align: center;
+
+      color: #725131;
+      font-size: 24px;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="poster">
+
+    <div class="title">
+      حديث اليوم
+    </div>
+
+    <div class="sayer-box">
+      <div class="sayer" id="sayer">
+        رسول الله محمد صلى الله عليه وآله
+      </div>
+    </div>
+
+    <div class="hadith-box" id="hadithBox">
+      <div class="hadith" id="hadith">
+        لَا يَزْرَأَنَّ أَحَدُكُمْ بِأَحَدٍ مِنْ خَلْقِ اللَّهِ، فَإِنَّهُ لَا يَدْرِي أَيُّهُمْ وَلِيُّ اللَّهِ.
+      </div>
+    </div>
+
+    <div class="reference-box" id="referenceBox">
+      <div class="reference" id="reference">
+        <bdi dir="rtl">بحار الأنوار، ج ٧٢، ص: ١٤٧</bdi>
+      </div>
+    </div>
+
+    <div class="footer">
+      من تطبيق حديث اليوم
+    </div>
+
+  </div>
+
+
+  <script>
+
+    function fitText(element, maxHeight, startSize, minSize, step) {
+
+      let size = startSize;
+
+      element.style.fontSize = size + "px";
+
+      while (
+        element.scrollHeight > maxHeight &&
+        size > minSize
+      ) {
+        size -= step;
+        element.style.fontSize = size + "px";
+      }
+    }
+
+
+    function fitSayer() {
+
+      const el = document.getElementById("sayer");
+
+      fitText(
+        el,
+        100,
+        40,
+        29,
+        1
+      );
+    }
+
+
+    function fitReference() {
+
+      const el = document.getElementById("reference");
+
+      fitText(
+        el,
+        110,
+        37,
+        27,
+        1
+      );
+    }
+
+
+    function fitHadith() {
+
+      const box =
+        document.getElementById("hadithBox");
+
+      const el =
+        document.getElementById("hadith");
+
+      const text =
+        (el.innerText || "").trim();
+
+      const length = text.length;
+
+      let fontSize = 55;
+      let lineHeight = 1.75;
+
+
+      /* اختيار الحجم الأولي حسب طول الحديث */
+
+      if (length <= 80) {
+
+        fontSize = 58;
+        lineHeight = 1.80;
+
+      }
+
+      else if (length <= 140) {
+
+        fontSize = 54;
+        lineHeight = 1.75;
+
+      }
+
+      else if (length <= 200) {
+
+        fontSize = 49;
+        lineHeight = 1.70;
+
+      }
+
+      else if (length <= 280) {
+
+        fontSize = 44;
+        lineHeight = 1.62;
+
+      }
+
+      else {
+
+        fontSize = 39;
+        lineHeight = 1.55;
+
+      }
+
+
+      el.style.fontSize =
+        fontSize + "px";
+
+      el.style.lineHeight =
+        lineHeight;
+
+
+      /* تصغير إضافي عند الضرورة */
+
+      while (
+        el.scrollHeight > box.clientHeight &&
+        fontSize > 31
+      ) {
+
+        fontSize -= 1;
+
+        el.style.fontSize =
+          fontSize + "px";
+      }
+
+
+      /* تقليل المسافة بين السطور عند الضرورة */
+
+      while (
+        el.scrollHeight > box.clientHeight &&
+        lineHeight > 1.35
+      ) {
+
+        lineHeight -= 0.03;
+
+        el.style.lineHeight =
+          lineHeight.toFixed(2);
+      }
+
+
+      /* الحديث القصير في منتصف المساحة،
+         والطويل يبدأ من الأعلى */
+
+      if (
+        el.scrollHeight >
+        box.clientHeight * 0.72
+      ) {
+
+        box.style.alignItems =
+          "flex-start";
+
+      }
+
+      else {
+
+        box.style.alignItems =
+          "center";
+
+      }
+    }
+
+
+    async function init() {
+
+      /* الانتظار حتى تحميل الخط العربي بالكامل */
+
+      if (document.fonts) {
+        await document.fonts.ready;
+      }
+
+      fitSayer();
+      fitHadith();
+      fitReference();
+    }
+
+
+    window.addEventListener(
+      "load",
+      () => {
+        setTimeout(init, 200);
+      }
+    );
+
+  </script>
+
+</body>
+</html>      background-size: 1080px 1920px;
       background-repeat: no-repeat;
       background-position: center;
     }
@@ -174,13 +518,13 @@
 
     <div class="hadith-box" id="hadithBox">
       <div class="hadith" id="hadith">
-        يَا أَبَاذَرٍّ لِيَكُنْ لَكَ فِي كُلِّ شَيْ‌ءٍ نِيَّةٌ حَتَّى فِي النَّوْمِ وَ الْأَكْلِ.
+        لَا يَزْرَأَنَّ أَحَدُكُمْ بِأَحَدٍ مِنْ خَلْقِ اللَّهِ، فَإِنَّهُ لَا يَدْرِي أَيُّهُمْ وَلِيُّ اللَّهِ.
       </div>
     </div>
 
     <div class="reference-box" id="referenceBox">
       <div class="reference" id="reference">
-        بحار الأنوار، ج ٧٤، ص: ٨٤
+        بحار الأنوار، ج ٧٢، ص: ١٤٧
       </div>
     </div>
 
