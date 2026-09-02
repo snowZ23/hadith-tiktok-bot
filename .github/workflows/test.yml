@@ -1,18 +1,21 @@
-name: Daily Hadith Image
+name: Daily Hadith TikTok
 
 on:
-  # يسمح لك بالتشغيل اليدوي وقتما تريد
   workflow_dispatch:
 
-  # تشغيل تلقائي يوميًا الساعة 10 مساءً بتوقيت العراق
+  # الساعة 10 مساءً بتوقيت العراق = 19:00 UTC
   schedule:
     - cron: "0 19 * * *"
 
 permissions:
   contents: write
 
+concurrency:
+  group: daily-hadith-tiktok
+  cancel-in-progress: false
+
 jobs:
-  generate:
+  generate-and-upload:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,16 +38,112 @@ jobs:
           npm install
           npx playwright install --with-deps chromium
 
-      - name: Generate Hadith HTML
+      - name: Generate Hadith
         run: python generate_html.py
 
-      - name: Create PNG image
+      - name: Create JPEG image
         run: node render.js
 
-      - name: Save generated image
+      # ننشئ اسمًا فريدًا للصورة حتى لا يأخذ TikTok نسخة قديمة من الكاش
+      - name: Prepare public TikTok image
+        run: |
+          mkdir -p published
+
+          PHOTO_PATH="published/hadith-${GITHUB_RUN_ID}.jpg"
+          cp hadith.jpg "$PHOTO_PATH"
+
+          echo "PHOTO_PATH=$PHOTO_PATH" >> "$GITHUB_ENV"
+          echo "TIKTOK_PHOTO_URL=https://snowz23.github.io/hadith-tiktok-bot/$PHOTO_PATH" >> "$GITHUB_ENV"
+
+      # ننشر الصورة على GitHub Pages أولًا
+      # لا نحفظ state.json بعد، حتى لا نتخطى الحديث إذا فشل TikTok
+      - name: Publish Hadith image
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add hadith.jpg output.html latest.json state.json
-          git commit -m "Generate daily Hadith image" || echo "Nothing to commit"
+
+          git add hadith.jpg output.html latest.json "$PHOTO_PATH"
+          git commit -m "Publish daily Hadith image" || echo "Nothing to commit"
+          git push
+
+      # ننتظر إلى أن تصبح الصورة الجديدة متاحة فعلًا على GitHub Pages
+      - name: Wait for GitHub Pages
+        run: |
+          echo "Waiting for image to become public..."
+
+          for i in {1..60}; do
+            if curl -fsS "$TIKTOK_PHOTO_URL" -o /tmp/hadith-check.jpg; then
+              echo "Image is available."
+              exit 0
+            fi
+
+            sleep 5
+          done
+
+          echo "GitHub Pages did not publish the image in time."
+          exit 1
+
+      # نستخدم آخر Refresh Token مشفر إن كان موجودًا.
+      # في أول تشغيل نستخدم TIKTOK_REFRESH_TOKEN من GitHub Secrets.
+      - name: Load TikTok refresh token
+        env:
+          INITIAL_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          TIKTOK_TOKEN_KEY: ${{ secrets.TIKTOK_TOKEN_KEY }}
+        run: |
+          if [ -f "tiktok_refresh.enc" ]; then
+
+            openssl enc -d \
+              -aes-256-cbc \
+              -pbkdf2 \
+              -pass env:TIKTOK_TOKEN_KEY \
+              -in tiktok_refresh.enc \
+              -out /tmp/current_refresh_token
+
+            TOKEN="$(cat /tmp/current_refresh_token)"
+
+          else
+
+            TOKEN="$INITIAL_REFRESH_TOKEN"
+
+          fi
+
+          echo "::add-mask::$TOKEN"
+          echo "TIKTOK_REFRESH_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+
+      # تجديد Access Token ثم إرسال الصورة إلى TikTok
+      - name: Upload Hadith to TikTok
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_OUT: /tmp/tiktok_new_refresh_token
+        run: |
+          python tiktok_upload.py
+
+      # TikTok قد يعطينا Refresh Token جديدًا.
+      # نحفظه مشفرًا وليس كنص مكشوف داخل المستودع.
+      - name: Encrypt new refresh token
+        env:
+          TIKTOK_TOKEN_KEY: ${{ secrets.TIKTOK_TOKEN_KEY }}
+        run: |
+          test -s /tmp/tiktok_new_refresh_token
+
+          NEW_TOKEN="$(cat /tmp/tiktok_new_refresh_token)"
+          echo "::add-mask::$NEW_TOKEN"
+
+          openssl enc \
+            -aes-256-cbc \
+            -pbkdf2 \
+            -salt \
+            -pass env:TIKTOK_TOKEN_KEY \
+            -in /tmp/tiktok_new_refresh_token \
+            -out tiktok_refresh.enc
+
+      # لا نحدّث ترتيب الأحاديث إلا بعد نجاح TikTok
+      - name: Save successful state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add state.json tiktok_refresh.enc
+          git commit -m "Save TikTok token and Hadith state" || echo "Nothing to commit"
           git push
