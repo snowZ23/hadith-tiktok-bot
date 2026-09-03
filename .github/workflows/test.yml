@@ -5,7 +5,7 @@ on:
 
   # الساعة 10 مساءً بتوقيت العراق = 19:00 UTC
   schedule:
-    - cron: "0 19 * * *"
+    - cron: "55 18 * * *"
 
 permissions:
   contents: write
